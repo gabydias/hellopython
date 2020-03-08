@@ -1,13 +1,30 @@
 # Importando o módulo do Flask e o módulo os
-from flask import Flask
+from flask import Flask, render_template
 from redis import Redis, RedisError
+import pymysql
+
 import os
 
 # Connect to Redis
-redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+redis = Redis(host="localhost", db=0, socket_connect_timeout=2, socket_timeout=2)
 
 # Objeto da Classe Flask que vamos usar para configurar e executar a aplicação
 app = Flask(__name__)
+
+# Conexão Simples com o MySQL
+class Database:
+    def __init__(self):
+        host = "127.0.0.1"
+        user = "appuser"
+        password = "213"
+        db = "sre_stack"
+        self.con = pymysql.connect(host=host, user=user, password=password, db=db, cursorclass=pymysql.cursors.DictCursor)
+        self.cur = self.con.cursor()
+
+    def list_db(self):
+        self.cur.execute("SELECT * FROM tecnologias")
+        result = self.cur.fetchall()
+        return result
 
 # Definindo a rota padrão da aplicação.
 @app.route("/")
@@ -17,11 +34,15 @@ def hello():
     try:
         visits = redis.incr("counter")
     except RedisError:
-        visits = "<i>cannot connect to Redis, counter disabled</i>"
+        visits = "cannot connect to Redis, counter disabled"
 
-    html = "<h3>{message}</h3>" \
-           "<b>Visits:</b> {visits}"
-    return html.format(message=os.getenv("MESSAGE", "Hello world"), visits=visits)
+    def db_query():
+        db = Database()
+        techs = db.list_db()
+        return techs
+    res = db_query()
+
+    return render_template('index.html', visits=visits, result=res)
 
 # Garantindo que o módulo não será executado se ele for importado por outro módulo.
 if __name__ == "__main__":

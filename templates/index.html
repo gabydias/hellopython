@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SRE Stack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<div class="banner">
+    <h1 class="banner-head">
+        STACK DE TECNOLOGIAS<br>
+        SRE / DEVOPS
+    </h1>
+</div>
+
+<table id="tabela">
+    {% if result %}
+    <tr>
+        <th>ID</th>
+        <th>Tecnologia</th>
+        <th>Documentação</th>
+    </tr>
+    {% for row in result %}
+    <tr>
+        <td> {{ row.id }}</td>
+        <td> {{ row.name }}</td>
+        <td> {{ row.doc }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+</table>
+
+<div class="footer l-box">
+    <p>
+      <h2>Visitas no Site: {{visits}}</h2>
+    </p>
+</div>
+
+</body>
+</html>
